@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="th" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ห้องเรียนครูสุจิตรา</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            thai: ['Kanit', 'Noto Sans Thai', 'sans-serif'],
+            body: ['Noto Sans Thai', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html, body { height: 100%; margin: 0; }
+    body { font-family: 'Noto Sans Thai', 'Kanit', sans-serif; }
+
+    .glass {
+      background: rgba(255,255,255,0.65);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.4);
+    }
+    .glass-strong {
+      background: rgba(255,255,255,0.82);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    .btn-3d {
+      transform: translateY(0);
+      box-shadow: 0 6px 0 var(--btn-shadow, #2563eb), 0 8px 20px rgba(0,0,0,0.15);
+      transition: all 0.12s cubic-bezier(.25,.46,.45,.94);
+    }
+    .btn-3d:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 var(--btn-shadow, #2563eb), 0 12px 28px rgba(0,0,0,0.2);
+    }
+    .btn-3d:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 var(--btn-shadow, #2563eb), 0 3px 8px rgba(0,0,0,0.12);
+    }
+
+    .card-3d {
+      transition: all 0.25s cubic-bezier(.25,.46,.45,.94);
+      box-shadow: 0 4px 0 #cbd5e1, 0 6px 20px rgba(0,0,0,0.08);
+      cursor: pointer;
+    }
+    .card-3d:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 0 #cbd5e1, 0 14px 32px rgba(0,0,0,0.12);
+    }
+    .card-3d:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #cbd5e1, 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .bg-mesh {
+      background-color: #f0f7ff;
+      background-image:
+        radial-gradient(at 20% 20%, #dbeafe 0, transparent 50%),
+        radial-gradient(at 80% 10%, #fce7f3 0, transparent 50%),
+        radial-gradient(at 50% 80%, #e0e7ff 0, transparent 50%),
+        radial-gradient(at 90% 90%, #fef3c7 0, transparent 40%);
+    }
+
+    .view { display: none; }
+    .view.active { display: block; animation: fadeSlide 0.35s ease-out; }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .cover-gradient-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .cover-gradient-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .cover-gradient-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    .cover-gradient-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+    .cover-gradient-5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+    .cover-gradient-6 { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); }
+
+    .toast-msg {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      padding: 12px 28px; border-radius: 12px; color: #fff; font-weight: 500;
+      z-index: 999; opacity: 0; transition: opacity 0.3s;
+      background: #22c55e; box-shadow: 0 4px 20px rgba(34,197,94,0.4);
+    }
+    .toast-msg.show { opacity: 1; }
+
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center;
+      z-index: 50; animation: fadeIn 0.2s ease-out;
+    }
+    .modal-overlay.show { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .modal-content {
+      background: white; border-radius: 24px; max-width: 600px; width: 90%;
+      padding: 32px; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      animation: slideUp 0.3s cubic-bezier(.25,.46,.45,.94);
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .close-btn {
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; background: #f3f4f6; color: #6b7280; cursor: pointer;
+      transition: all 0.2s; border: none; font-size: 20px;
+    }
+    .close-btn:hover { background: #e5e7eb; color: #374151; }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js" type="text/javascript"></script>
+</head>
+<body class="h-full bg-mesh overflow-auto">
+  <div id="toast" class="toast-msg"></div>
+  <div id="modal-overlay" class="modal-overlay" onclick="if(event.target.id==='modal-overlay') closeModal()">
+    <div class="modal-content">
+      <div class="flex justify-between items-start mb-6">
+        <h2 id="modal-title" class="font-thai text-2xl font-bold text-slate-800"></h2><button class="close-btn" onclick="closeModal()">✕</button>
+      </div>
+      <p id="modal-desc" class="text-slate-600 mb-6 leading-relaxed"></p>
+      <p class="text-xs text-slate-400 mb-4"><strong>ประเภทสื่อ:</strong> <span id="modal-type" class="inline-flex items-center gap-1.5"></span></p>
+      <button onclick="openResourceLink()" class="btn-3d w-full py-4 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-thai font-semibold text-lg flex items-center justify-center gap-2" style="--btn-shadow:#1e40af">
+        <i class="fi fi-rr-share"></i> เปิดสื่อการสอน
+      </button>
+    </div>
+  </div>
+  <nav class="glass fixed top-0 left-0 w-full z-50 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <button onclick="navigate('home')" class="flex items-center gap-2 group">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold shadow">
+          <i class="fi fi-rr-book" style="color:white;"></i>
+        </div>
+        <span id="nav-title" class="font-thai font-semibold text-lg text-slate-800 group-hover:text-blue-600 transition hidden sm:inline">ห้องเรียนครูสุจิตรา</span>
+      </button>
+      <div class="flex items-center gap-2">
+        <button onclick="navigate('home')" class="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-white/60 transition flex items-center gap-1.5">
+          <i class="fi fi-rr-home"></i> <span class="hidden sm:inline">หน้าแรก</span>
+        </button>
+        <button onclick="navigate('admin')" class="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-white/60 transition" title="Admin">
+          <i class="fi fi-rr-settings"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+  <main class="w-full pt-20 pb-12 px-4">
+    <div class="max-w-6xl mx-auto">
+      <section id="view-home" class="view active">
+        <div class="text-center py-8 sm:py-16">
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 text-blue-600 text-sm font-medium mb-6">
+            <i class="fi fi-rr-lightbulb"></i> สื่อการสอนคุณภาพสำหรับนักเรียน
+          </div>
+          <h1 id="home-heading" class="font-thai text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-800 mb-4 leading-tight">ยินดีต้อนรับสู่<br><span class="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">ห้องเรียนครูสุจิตรา</span></h1>
+          <p id="home-sub" class="text-slate-500 text-lg sm:text-xl max-w-xl mx-auto mb-12">แหล่งรวมสื่อการสอนภาษาไทย ม.1 และ ม.3 ครบจบในที่เดียว</p>
+          <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+            <button onclick="openGrade(1)" class="btn-3d w-64 sm:w-72 rounded-2xl px-8 py-8 bg-gradient-to-br from-blue-500 to-blue-600 text-white group" style="--btn-shadow:#1e40af">
+              <div class="text-4xl mb-3">
+                <i class="fi fi-rr-book" style="color:white;"></i>
+              </div>
+              <div class="font-thai text-2xl font-bold mb-1">สื่อการสอน ม.1</div>
+              <div class="text-blue-100 text-sm">มัธยมศึกษาปีที่ 1</div>
+            </button>
+            <button onclick="openGrade(3)" class="btn-3d w-64 sm:w-72 rounded-2xl px-8 py-8 bg-gradient-to-br from-rose-400 to-pink-500 text-white group" style="--btn-shadow:#be123c">
+              <div class="text-4xl mb-3">
+                <i class="fi fi-rr-books" style="color:white;"></i>
+              </div>
+              <div class="font-thai text-2xl font-bold mb-1">สื่อการสอน ม.3</div>
+              <div class="text-pink-100 text-sm">มัธยมศึกษาปีที่ 3</div>
+            </button>
+          </div>
+          <div class="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
+            <div class="glass-strong rounded-2xl p-6 text-center card-3d cursor-default">
+              <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center mx-auto mb-3 text-2xl">
+                <i class="fi fi-rr-document" style="color:#d97706;"></i>
+              </div>
+              <h3 class="font-thai font-semibold text-slate-700 mb-1">เอกสารสอน</h3>
+              <p class="text-slate-400 text-sm">ไฟล์ PDF และเอกสารครบครัน</p>
+            </div>
+            <div class="glass-strong rounded-2xl p-6 text-center card-3d cursor-default">
+              <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mx-auto mb-3 text-2xl">
+                <i class="fi fi-rr-play-alt" style="color:#0284c7;"></i>
+              </div>
+              <h3 class="font-thai font-semibold text-slate-700 mb-1">วิดีโอสอน</h3>
+              <p class="text-slate-400 text-sm">บทเรียนวิดีโอสูง</p>
+            </div>
+            <div class="glass-strong rounded-2xl p-6 text-center card-3d cursor-default">
+              <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center mx-auto mb-3 text-2xl">
+                <i class="fi fi-rr-presentation" style="color:#16a34a;"></i>
+              </div>
+              <h3 class="font-thai font-semibold text-slate-700 mb-1">สไลด์งาน</h3>
+              <p class="text-slate-400 text-sm">สไลด์นำเสนออย่างต่อเนื่อง</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-chapters" class="view">
+        <div class="mb-6">
+          <button onclick="navigate('home')" class="inline-flex items-center gap-1.5 text-slate-500 hover:text-blue-600 text-sm font-medium transition mb-4">
+            <i class="fi fi-rr-arrow-left"></i> กลับหน้าแรก
+          </button>
+          <h2 id="chapter-title" class="font-thai text-3xl font-bold text-slate-800"></h2>
+        </div>
+        <div id="chapter-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        <div id="no-chapters" class="hidden text-center py-16 text-slate-400">
+          <div class="text-5xl mb-3"><i class="fi fi-rr-inbox"></i></div>
+          <p class="font-medium">ยังไม่มีบทเรียนในชั้นนี้</p>
+        </div>
+      </section>
+
+      <section id="view-media" class="view">
+        <div class="mb-6" id="media-title"></div>
+        <div id="media-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        <div id="no-media" class="hidden text-center py-16 text-slate-400">
+          <div class="text-5xl mb-3"><i class="fi fi-rr-inbox"></i></div>
+          <p class="font-medium">ยังไม่มีสื่อการสอนในบทเรียนนี้</p>
+        </div>
+      </section>
+
+      <section id="view-admin" class="view">
+        <div id="admin-login" class="flex items-center justify-center py-12 sm:py-20">
+          <div class="glass-strong rounded-3xl p-8 sm:p-10 w-full max-w-md shadow-xl">
+            <div class="text-center mb-8">
+              <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto mb-4 text-white text-2xl shadow-lg">
+                <i class="fi fi-rr-lock" style="color:white;"></i>
+              </div>
+              <h2 class="font-thai text-2xl font-bold text-slate-800">เข้าสู่ระบบ Admin</h2>
+              <p class="text-slate-400 text-sm mt-1">กรอกข้อมูลเพื่อเข้าจัดการสื่อการสอน</p>
+            </div>
+            <form id="login-form" onsubmit="handleLogin(event)">
+              <div class="mb-4">
+                <label for="login-user" class="block text-sm font-medium text-slate-600 mb-1.5">ชื่อผู้ใช้</label>
+                <input id="login-user" type="text" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white/70 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none transition text-slate-700" placeholder="admin">
+              </div>
+              <div class="mb-2">
+                <label for="login-pass" class="block text-sm font-medium text-slate-600 mb-1.5">รหัสผ่าน</label>
+                <input id="login-pass" type="password" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white/70 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none transition text-slate-700" placeholder="••••••">
+              </div>
+              <p id="login-error" class="text-red-500 text-sm mb-4 hidden">ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</p>
+              <p class="text-xs text-slate-400 mb-5">กรุณา login ด้วย admin / 1234</p>
+              <button type="submit" class="btn-3d w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-thai font-semibold text-lg" style="--btn-shadow:#4338ca"> เข้าสู่ระบบ </button>
+            </form>
+          </div>
+        </div>
+        
+        <div id="admin-dashboard" class="hidden">
+          <div class="flex items-center justify-between mb-8">
+            <h2 class="font-thai text-2xl sm:text-3xl font-bold text-slate-800 flex items-center gap-2"><i class="fi fi-rr-settings"></i> Admin Dashboard</h2>
+            <button onclick="adminLogout()" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 text-sm font-medium transition">
+              <i class="fi fi-rr-sign-out"></i> ออกจากระบบ
+            </button>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+            <div class="glass-strong rounded-2xl p-5 text-center card-3d cursor-default">
+              <div class="text-3xl font-bold text-blue-600 font-thai" id="stat-total">0</div>
+              <div class="text-slate-400 text-sm mt-1">สื่อทั้งหมด</div>
+            </div>
+            <div class="glass-strong rounded-2xl p-5 text-center card-3d cursor-default">
+              <div class="text-3xl font-bold text-indigo-600 font-thai" id="stat-m1">0</div>
+              <div class="text-slate-400 text-sm mt-1">ม.1</div>
+            </div>
+            <div class="glass-strong rounded-2xl p-5 text-center card-3d cursor-default">
+              <div class="text-3xl font-bold text-pink-500 font-thai" id="stat-m3">0</div>
+              <div class="text-slate-400 text-sm mt-1">ม.3</div>
+            </div>
+            <div class="glass-strong rounded-2xl p-5 text-center card-3d cursor-default">
+              <div class="text-3xl font-bold text-amber-500 font-thai">4</div>
+              <div class="text-slate-400 text-sm mt-1">ประเภทสื่อ</div>
+            </div>
+          </div>
+          
+          <div class="glass-strong rounded-3xl p-6 sm:p-8 shadow-lg mb-8">
+            <h3 class="font-thai text-xl font-bold text-slate-800 mb-6 flex items-center gap-2"><i class="fi fi-rr-plus"></i> เพิ่มสื่อการสอนใหม่</h3>
+            <form id="add-form" onsubmit="handleAddResource(event)" class="space-y-5">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label for="add-grade" class="block text-sm font-medium text-slate-600 mb-1.5">ชั้นปี</label>
+                  <select id="add-grade" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white/70 focus:ring-2 focus:ring-blue-400 outline-none transition text-slate-700" required>
+                    <option value="">-- เลือกชั้นปี --</option>
+                    <option value="1">มัธยมศึกษาปีที่ 1</option>
+                    <option value="3">มัธยมศึกษาปีที่ 3</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="add-type" class="block text-sm font-medium text-slate-600 mb-1.5">ประเภทสื่อ</label>
+                  <select id="add-type" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white/70 focus:ring-2 focus:ring-blue-400 outline-none transition text-slate-700" required>
+                    <option value="">-- เลือกประเภทสื่อ --</option>
+                    <option value="document">เอกสาร</option>
+                    <option value="video">วิดีโอ</option>
+                    <option value="slide">สไลด์</option>
+                    <option value="link">ลิงก์ภายนอก</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label for="add-chapter" class="block text-sm font-medium text-slate-600 mb-1.5">ชื่อบทเรียน</label>
+                <input id="add-chapter" type="text" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white/70 focus:ring-2 focus:ring-blue-400 outline-none transition text-slate-700" placeholder="เช่น นิราศภูเขาทอง" required>
+              </div>
+              <div>
+                <label for="add-title" class="block text-sm font-medium text-slate-600 mb-1.5">ชื่อสื่อการสอน</label>
+                <input id="add-title" type="text" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white/70 focus:ring-2 focus:ring-blue-400 outline-none transition text-slate-700" placeholder="เช่น บทเรียน ภาษาไทยขั้นพื้นฐาน" required>
+              </div>
+              <div>
+                <label for="add-desc" class="block text-sm font-medium text-slate-600 mb-1.5">คำอธิบาย</label>
+                <textarea id="add-desc" rows="3" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white/70 focus:ring-2 focus:ring-blue-400 outline-none transition text-slate-700 resize-y" placeholder="บรรยายเนื้อหาของสื่อการสอน..." required></textarea>
+              </div>
+              <div>
+                <label for="add-url" class="block text-sm font-medium text-slate-600 mb-1.5">URL ลิงก์เปิดสื่อ</label>
+                <input id="add-url" type="url" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white/70 focus:ring-2 focus:ring-blue-400 outline-none transition text-slate-700" placeholder="https://example.com/resource" required>
+              </div>
+              <button type="submit" class="btn-3d px-8 py-3.5 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white font-thai font-semibold text-lg" style="--btn-shadow:#15803d">
+                <span class="flex items-center gap-2 justify-center"> <i class="fi fi-rr-disk"></i> บันทึกสื่อการสอน </span>
+              </button>
+            </form>
+          </div>
+          
+          <div class="glass-strong rounded-3xl p-6 sm:p-8 shadow-lg">
+            <h3 class="font-thai text-xl font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fi fi-rr-list"></i> รายการสื่อการสอนทั้งหมด</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm text-left">
+                <thead>
+                  <tr class="border-b border-slate-200 text-slate-500">
+                    <th class="py-3 px-3 font-medium">#</th>
+                    <th class="py-3 px-3 font-medium">ชื่อสื่อการสอน</th>
+                    <th class="py-3 px-3 font-medium hidden sm:table-cell">ชั้น</th>
+                    <th class="py-3 px-3 font-medium hidden sm:table-cell">บทเรียน</th>
+                    <th class="py-3 px-3 font-medium hidden sm:table-cell">ประเภท</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // !! สิ่งสำคัญ !! นำ URL ที่ได้จากขั้นตอนที่ 2 มาใส่ตรงนี้
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCn3W-E_WB2wABAlBIOFV62dmEowZQS3Zs0iDZj66mXT1mfkhNZRfk-ZSKJrQPvwbR/exec';
+
+    const coverGradients = ['cover-gradient-1','cover-gradient-2','cover-gradient-3','cover-gradient-4','cover-gradient-5','cover-gradient-6'];
+    const resourceIcons = {
+      document: 'fi-rr-document',
+      video: 'fi-rr-play-alt',
+      slide: 'fi-rr-presentation',
+      link: 'fi-rr-share'
+    };
+
+    let resources = [];
+    let currentGrade = 1;
+    let currentChapter = null;
+    let selectedResource = null;
+    let isAdminLoggedIn = false;
+
+    // ---- ส่วนดึงข้อมูลจาก Google Sheets (เริ่มต้น) ----
+    async function loadResourcesFromDB() {
+      try {
+        if(SCRIPT_URL === 'ใส่_URL_ของ_GOOGLE_APPS_SCRIPT_ตรงนี้') {
+          console.warn("กรุณาใส่ URL ของ Google Apps Script ก่อน");
+          return;
+        }
+        const response = await fetch(SCRIPT_URL);
+        const data = await response.json();
+        resources = data;
+        console.log("Loaded data:", resources);
+      } catch (error) {
+        console.error("Error loading data from Google Sheets:", error);
+        showToast('ไม่สามารถดึงข้อมูลได้ โปรดตรวจสอบการเชื่อมต่อ');
+      }
+    }
+
+    // โหลดข้อมูลทันทีเมื่อเปิดหน้าเว็บ
+    window.onload = loadResourcesFromDB;
+    // ---------------------------------------------
+
+    const defaultConfig = {
+      site_title: 'ห้องเรียนครูสุจิตรา',
+      welcome_heading: 'ยินดีต้อนรับสู่ห้องเรียนครูสุจิตรา',
+      welcome_sub: 'แหล่งรวมสื่อการสอนภาษาไทย ม.1 และ ม.3',
+      background_color: '#f0f7ff',
+      surface_color: '#ffffff',
+      text_color: '#1e293b',
+      primary_action_color: '#3b82f6',
+      secondary_action_color: '#64748b',
+      font_family: 'Kanit',
+      font_size: 16
+    };
+
+    function applyConfig(config) {
+      const t = config.site_title || defaultConfig.site_title;
+      document.getElementById('nav-title').textContent = t;
+      document.title = t;
+      const h = config.welcome_heading || defaultConfig.welcome_heading;
+      const el = document.getElementById('home-heading');
+      if (h.includes(t)) {
+        const parts = h.split(t);
+        el.innerHTML = `${parts[0]}<br><span class="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">${t}</span>${parts[1]||''}`;
+      } else {
+        el.textContent = h;
+      }
+      document.getElementById('home-sub').textContent = config.welcome_sub || defaultConfig.welcome_sub;
+      document.body.style.backgroundColor = config.background_color || defaultConfig.background_color;
+      document.body.style.color = config.text_color || defaultConfig.text_color;
+      document.body.style.fontFamily = `${config.font_family || defaultConfig.font_family}, Noto Sans Thai, sans-serif`;
+      document.body.style.fontSize = (config.font_size || defaultConfig.font_size) + 'px';
+    }
+
+    if(window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (config) => applyConfig(config),
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            { get: () => config.background_color || defaultConfig.background_color, set: v => { config.background_color = v; window.elementSdk.setConfig({ background_color: v }); } },
+            { get: () => config.surface_color || defaultConfig.surface_color, set: v => { config.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); } },
+            { get: () => config.text_color || defaultConfig.text_color, set: v => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
+            { get: () => config.primary_action_color || defaultConfig.primary_action_color, set: v => { config.primary_action_color = v; window.elementSdk.setConfig({ primary_action_color: v }); } },
+            { get: () => config.secondary_action_color || defaultConfig.secondary_action_color, set: v => { config.secondary_action_color = v; window.elementSdk.setConfig({ secondary_action_color: v }); } }
+          ],
+          borderables: [],
+          fontEditable: { get: () => config.font_family || defaultConfig.font_family, set: v => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); } },
+          fontSizeable: { get: () => config.font_size || defaultConfig.font_size, set: v => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); } }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ['site_title', config.site_title || defaultConfig.site_title],
+          ['welcome_heading', config.welcome_heading || defaultConfig.welcome_heading],
+          ['welcome_sub', config.welcome_sub || defaultConfig.welcome_sub]
+        ])
+      });
+    }
+
+    function navigate(view) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      const el = document.getElementById('view-' + view);
+      if (el) el.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openGrade(g) {
+      currentGrade = g;
+      currentChapter = null;
+      document.getElementById('chapter-title').innerHTML = g === 1
+        ? '<i class="fi fi-rr-book" style="vertical-align:middle;margin-right:8px;"></i>บทเรียน มัธยมศึกษาปีที่ 1'
+        : '<i class="fi fi-rr-books" style="vertical-align:middle;margin-right:8px;"></i>บทเรียน มัธยมศึกษาปีที่ 3';
+      renderChapterCards();
+      navigate('chapters');
+    }
+
+    function getUniqueChapters(grade) {
+      return resources
+        .filter(r => r.grade === grade)
+        .map(r => r.chapter)
+        .filter((ch, i, arr) => arr.indexOf(ch) === i);
+    }
+
+    function renderChapterCards() {
+      const container = document.getElementById('chapter-cards');
+      const noMsg = document.getElementById('no-chapters');
+      const chapters = getUniqueChapters(currentGrade);
+
+      container.innerHTML = '';
+      if (chapters.length === 0) {
+        noMsg.classList.remove('hidden');
+        return;
+      }
+      noMsg.classList.add('hidden');
+
+      chapters.forEach((ch, i) => {
+        const card = document.createElement('div');
+        card.className = 'card-3d rounded-2xl overflow-hidden bg-white/80 p-6';
+        card.onclick = () => openChapter(ch);
+        card.innerHTML = `
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-14 h-14 rounded-xl ${coverGradients[i % coverGradients.length]} flex items-center justify-center text-2xl shadow">
+              <i class="fi fi-rr-book" style="color:white;"></i>
+            </div>
+          </div>
+          <h3 class="font-thai font-bold text-slate-800 text-lg">${ch}</h3>
+          <p class="text-slate-400 text-sm mt-2">คลิกเพื่อดูสื่อการสอน</p>`;
+        container.appendChild(card);
+      });
+    }
+
+    function openChapter(ch) {
+      currentChapter = ch;
+      document.getElementById('media-title').innerHTML = `
+        <button onclick="navigate('chapters')" class="inline-flex items-center gap-1.5 text-slate-500 hover:text-blue-600 text-sm font-medium transition mr-3">
+          <i class="fi fi-rr-arrow-left"></i> กลับบทเรียน
+        </button>
+        <span class="font-thai font-bold text-slate-800"><i class="fi fi-rr-document" style="vertical-align:middle;margin-right:8px;"></i>${ch}</span>`;
+      renderMediaCards();
+      navigate('media');
+    }
+
+    function renderMediaCards() {
+      const container = document.getElementById('media-cards');
+      const noMsg = document.getElementById('no-media');
+      const filtered = resources.filter(r => r.grade === currentGrade && r.chapter === currentChapter);
+
+      container.innerHTML = '';
+      if (filtered.length === 0) {
+        noMsg.classList.remove('hidden');
+        return;
+      }
+      noMsg.classList.add('hidden');
+
+      filtered.forEach((r, i) => {
+        const card = document.createElement('div');
+        card.className = 'card-3d rounded-2xl overflow-hidden bg-white/80';
+        card.onclick = () => openResourceModal(r);
+        const iconClass = resourceIcons[r.type] || 'fi-rr-document';
+        card.innerHTML = `
+          <div class="${coverGradients[i % coverGradients.length]} h-36 flex items-center justify-center text-5xl">
+            <i class="fi ${iconClass}" style="color:white;"></i>
+          </div>
+          <div class="p-5">
+            <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-600">${{ document: 'เอกสาร', video: 'วิดีโอ', slide: 'สไลด์', link: 'ลิงก์' }[r.type] || r.type}</span>
+            <h3 class="font-thai font-bold text-slate-800 mt-2 text-lg">${r.title}</h3>
+            <p class="text-slate-400 text-sm mt-1">${r.desc}</p>
+          </div>`;
+        container.appendChild(card);
+      });
+    }
+
+    function openResourceModal(resource) {
+      selectedResource = resource;
+      document.getElementById('modal-title').textContent = resource.title;
+      document.getElementById('modal-desc').textContent = resource.desc;
+      const iconClass = resourceIcons[resource.type] || 'fi-rr-document';
+      const typeName = { document: 'เอกสาร', video: 'วิดีโอ', slide: 'สไลด์', link: 'ลิงก์ภายนอก' }[resource.type] || resource.type;
+      document.getElementById('modal-type').innerHTML = `<i class="fi ${iconClass}" style="color:#3b82f6;"></i> ${typeName}`;
+      document.getElementById('modal-overlay').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('show');
+      selectedResource = null;
+    }
+
+    function openResourceLink() {
+      if (selectedResource) {
+        window.open(selectedResource.url, '_blank', 'noopener,noreferrer');
+        closeModal();
+      }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('login-user').value;
+      const p = document.getElementById('login-pass').value;
+      if (u === 'admin' && p === '1234') {
+        isAdminLoggedIn = true;
+        document.getElementById('admin-login').classList.add('hidden');
+        document.getElementById('admin-dashboard').classList.remove('hidden');
+        document.getElementById('login-error').classList.add('hidden');
+        updateAdminStats();
+        renderAdminTable();
+      } else {
+        document.getElementById('login-error').classList.remove('hidden');
+      }
+    }
+
+    function adminLogout() {
+      isAdminLoggedIn = false;
+      document.getElementById('admin-dashboard').classList.add('hidden');
+      document.getElementById('admin-login').classList.remove('hidden');
+      document.getElementById('login-user').value = '';
+      document.getElementById('login-pass').value = '';
+    }
+
+    function updateAdminStats() {
+      document.getElementById('stat-total').textContent = resources.length;
+      document.getElementById('stat-m1').textContent = resources.filter(r => r.grade === 1).length;
+      document.getElementById('stat-m3').textContent = resources.filter(r => r.grade === 3).length;
+    }
+
+    function renderAdminTable() {
+      const body = document.getElementById('admin-table-body');
+      body.innerHTML = '';
+      resources.forEach((r, i) => {
+        const iconClass = resourceIcons[r.type] || 'fi-rr-document';
+        const typeName = { document: 'เอกสาร', video: 'วิดีโอ', slide: 'สไลด์', link: 'ลิงก์' }[r.type] || r.type;
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-slate-100 hover:bg-blue-50/40 transition';
+        tr.innerHTML = `
+          <td class="py-3 px-3 text-slate-400">${i+1}</td>
+          <td class="py-3 px-3 font-medium text-slate-700"><i class="fi ${iconClass}"></i> ${r.title}</td>
+          <td class="py-3 px-3 hidden sm:table-cell"><span class="text-xs px-2 py-0.5 rounded-full ${r.grade===1?'bg-blue-100 text-blue-600':'bg-pink-100 text-pink-600'}">ม.${r.grade}</span></td>
+          <td class="py-3 px-3 hidden sm:table-cell text-slate-500">${r.chapter || '-'}</td>
+          <td class="py-3 px-3 hidden sm:table-cell text-slate-500">${typeName}</td>`;
+        body.appendChild(tr);
+      });
+    }
+
+    // ---- ส่วนส่งข้อมูลบันทึกลง Google Sheets ----
+    async function handleAddResource(e) {
+      e.preventDefault();
+      
+      if(SCRIPT_URL === 'ใส่_URL_ของ_GOOGLE_APPS_SCRIPT_ตรงนี้') {
+        showToast('กรุณาตั้งค่า SCRIPT_URL ในโค้ดก่อนทำการบันทึกข้อมูล');
+        return;
+      }
+
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalBtnHtml = submitBtn.innerHTML;
+      submitBtn.innerHTML = "กำลังบันทึก...";
+      submitBtn.disabled = true;
+
+      const newResource = {
+        grade: parseInt(document.getElementById('add-grade').value),
+        chapter: document.getElementById('add-chapter').value,
+        type: document.getElementById('add-type').value,
+        title: document.getElementById('add-title').value,
+        desc: document.getElementById('add-desc').value,
+        url: document.getElementById('add-url').value
+      };
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8", 
+          },
+          body: JSON.stringify(newResource),
+        });
+        
+        const result = await response.json();
+        
+        if(result.status === 'success') {
+          newResource.id = result.id;
+          resources.push(newResource);
+          updateAdminStats();
+          renderAdminTable();
+          e.target.reset();
+          showToast('บันทึกสื่อการสอนลงฐานข้อมูลสำเร็จแล้ว');
+        } else {
+          showToast('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+        }
+
+      } catch (error) {
+        console.error("Error saving data:", error);
+        showToast('เชื่อมต่อฐานข้อมูลล้มเหลว');
+      } finally {
+        submitBtn.innerHTML = originalBtnHtml;
+        submitBtn.disabled = false;
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+  </script>
+</body>
+</html>
