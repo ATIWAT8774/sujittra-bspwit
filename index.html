@@ -100,14 +100,17 @@
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center;
       z-index: 50; animation: fadeIn 0.2s ease-out;
+      padding: 1rem;
     }
     .modal-overlay.show { display: flex; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     .modal-content {
-      background: white; border-radius: 24px; max-width: 600px; width: 90%;
+      background: white; border-radius: 24px; max-width: 600px; width: 100%;
       padding: 32px; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
       animation: slideUp 0.3s cubic-bezier(.25,.46,.45,.94);
+      max-height: 90vh;
+      overflow-y: auto;
     }
     @keyframes slideUp {
       from { opacity: 0; transform: translateY(24px); }
@@ -127,6 +130,8 @@
 </head>
 <body class="h-full bg-mesh overflow-auto">
   <div id="toast" class="toast-msg"></div>
+  
+  <!-- ส่วนของ Modal ที่อัปเดตใหม่ -->
   <div id="modal-overlay" class="modal-overlay" onclick="if(event.target.id==='modal-overlay') closeModal()">
     <div class="modal-content">
       <div class="flex justify-between items-start mb-6">
@@ -134,11 +139,27 @@
       </div>
       <p id="modal-desc" class="text-slate-600 mb-6 leading-relaxed"></p>
       <p class="text-xs text-slate-400 mb-4"><strong>ประเภทสื่อ:</strong> <span id="modal-type" class="inline-flex items-center gap-1.5"></span></p>
-      <button onclick="openResourceLink()" class="btn-3d w-full py-4 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-thai font-semibold text-lg flex items-center justify-center gap-2" style="--btn-shadow:#1e40af">
-        <i class="fi fi-rr-share"></i> เปิดสื่อการสอน
-      </button>
+      
+      <!-- ปุ่มตัวเลือก 2 ปุ่ม -->
+      <div class="flex flex-col sm:flex-row gap-4 mt-6">
+        <button onclick="openResourceLink()" class="btn-3d flex-1 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-thai font-semibold text-lg flex items-center justify-center gap-2" style="--btn-shadow:#1e40af">
+          <i class="fi fi-rr-share"></i> เปิดสื่อการสอน
+        </button>
+        <button onclick="toggleQRCode()" class="btn-3d flex-1 py-3 rounded-xl bg-slate-100 text-slate-700 font-thai font-semibold text-lg flex items-center justify-center gap-2 hover:bg-slate-200" style="--btn-shadow:#94a3b8">
+          <i class="fi fi-rr-qrcode"></i> คิวอาร์โค้ด
+        </button>
+      </div>
+
+      <!-- พื้นที่แสดง QR Code (ซ่อนไว้เป็นค่าเริ่มต้น) -->
+      <div id="qr-container" class="hidden mt-8 text-center animation-fade">
+        <p class="text-sm text-slate-500 mb-3 font-medium">สแกนเพื่อเปิดผ่านโทรศัพท์มือถือ</p>
+        <div class="inline-block p-4 bg-white rounded-2xl shadow-sm border border-slate-200">
+          <img id="qr-img" src="" alt="QR Code" class="w-48 h-48 mx-auto object-contain">
+        </div>
+      </div>
     </div>
   </div>
+
   <nav class="glass fixed top-0 left-0 w-full z-50 shadow-sm">
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
       <button onclick="navigate('home')" class="flex items-center gap-2 group">
@@ -368,7 +389,7 @@
     let selectedResource = null;
     let isAdminLoggedIn = false;
 
-    // ---- ส่วนดึงข้อมูลจาก Google Sheets (เริ่มต้น) ----
+    // ---- ส่วนดึงข้อมูลจาก Google Sheets ----
     async function loadResourcesFromDB() {
       try {
         if(SCRIPT_URL === 'ใส่_URL_ของ_GOOGLE_APPS_SCRIPT_ตรงนี้') {
@@ -387,7 +408,6 @@
 
     // โหลดข้อมูลทันทีเมื่อเปิดหน้าเว็บ
     window.onload = loadResourcesFromDB;
-    // ---------------------------------------------
 
     const defaultConfig = {
       site_title: 'ห้องเรียนครูสุจิตรา',
@@ -545,18 +565,40 @@
       const iconClass = resourceIcons[resource.type] || 'fi-rr-document';
       const typeName = { document: 'เอกสาร', video: 'วิดีโอ', slide: 'สไลด์', link: 'ลิงก์ภายนอก' }[resource.type] || resource.type;
       document.getElementById('modal-type').innerHTML = `<i class="fi ${iconClass}" style="color:#3b82f6;"></i> ${typeName}`;
+      
+      // ปิด QR Code ทุกครั้งที่เปิดหน้าต่างใหม่
+      document.getElementById('qr-container').classList.add('hidden');
       document.getElementById('modal-overlay').classList.add('show');
     }
 
     function closeModal() {
       document.getElementById('modal-overlay').classList.remove('show');
       selectedResource = null;
+      document.getElementById('qr-container').classList.add('hidden'); // รีเซ็ต QR
     }
 
     function openResourceLink() {
       if (selectedResource) {
         window.open(selectedResource.url, '_blank', 'noopener,noreferrer');
         closeModal();
+      }
+    }
+
+    // ฟังก์ชันสร้างและแสดง QR Code
+    function toggleQRCode() {
+      if (!selectedResource) return;
+      
+      const qrContainer = document.getElementById('qr-container');
+      const qrImg = document.getElementById('qr-img');
+      
+      if (qrContainer.classList.contains('hidden')) {
+        // สร้าง QR Code ผ่าน API ของ qrserver (ใช้ฟรี ไม่จำกัด)
+        const encodedUrl = encodeURIComponent(selectedResource.url);
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodedUrl}&margin=10`;
+        
+        qrContainer.classList.remove('hidden');
+      } else {
+        qrContainer.classList.add('hidden');
       }
     }
 
